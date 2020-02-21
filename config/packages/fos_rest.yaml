@@ -10,3 +10,4 @@ fos_rest:
     format_listener:
         rules:
             - { path: ^/api, fallback_format: json, priorities: [ json ] }
+            - { path: ^/, fallback_format: json, priorities: [ json, html] }
