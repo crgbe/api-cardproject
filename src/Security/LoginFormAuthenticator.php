@@ -5,7 +5,6 @@ namespace App\Security;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -34,22 +33,12 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
     public function supports(Request $request)
     {
-        if(!$this->session->get('tokens')){
-            $this->session->set('tokens', []);
-        }
-
-        return 'app_login' === $request->attributes->get('_route')
-            && $request->isMethod('POST');
+        return 'app_login' === $request->attributes->get('_route') &&
+            $request->isMethod('POST');
     }
 
     public function getCredentials(Request $request)
     {
-        if($request->headers->has('Authorization') && 0 === strpos($request->headers->get('Authorization'), 'Bearer ')){
-            return [
-                'token' => substr($request->headers->get('Authorization'), 7),
-            ];
-        }
-
         return [
             'email' => $request->request->get('email'),
         ];
@@ -57,48 +46,37 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        $sessionTokens = $this->session->get('tokens');
-
-        if(isset($credentials['token'])){
-            if(in_array($credentials['token'], $sessionTokens)){
-                return $this->userRepository->find(array_search($credentials['token'], $sessionTokens));
-            }
-        }
-
-        return $this->userRepository->findOneBy(['email' => $credentials['email']??null]);
+        return $this->userRepository->findOneBy(['email' => $credentials['email']]);
     }
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-//        return isset($credentials['token']);
         return true;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $response = new JsonResponse();
+        if(!$this->session->get('tokens')){
+            $sessionTokens = $this->session->set('tokens', []);
+        }
+
+        $sessionTokens = $this->session->get('tokens');
 
         /**@var User $user*/
         $user = $token->getUser();
-        $sessionTokens = $this->session->get('tokens');
-
+        $response = new JsonResponse();
         $data = [
-            'message' => "Vous êtes désormais authentifié, vous pouvez accéder à n'importe quelle ressources aux urls (/api)"
+            'message' => "Vous êtes désormais authentifié. Utilisez ce token pour accéder à n'importe quelle ressources aux urls (/api)",
+            'token' => bin2hex(random_bytes(60)),
         ];
 
-        if(!array_key_exists($user->getId(), $sessionTokens)){
-            unset($data);
-            $sessionTokens[$user->getId()] = bin2hex(random_bytes(60));
-            $this->session->set('tokens', $sessionTokens);
+        $sessionTokens[$user->getId()] = $data['token'];
+        $this->session->set('tokens', $sessionTokens);
 
-            $data = [
-                'message' => "S'il vous plaît, utilisez le token ci-dessous pour vous connecter",
-                'token' => $sessionTokens[$user->getId()],
-            ];
 
-            return $response->setData($data);
-        }
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setData($data);
 
-        return $response->setData($data);
+        return $response;
     }
 }
