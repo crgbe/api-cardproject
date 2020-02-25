@@ -36,6 +36,10 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
+        if(!$this->session->has('tokens')){
+            $this->session->set('tokens', []);
+        }
+
         $sessionTokens = $this->session->get('tokens');
 
         if(!in_array($credentials, $sessionTokens)){

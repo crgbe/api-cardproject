@@ -7,9 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\CardRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\FamilyRepository")
  */
-class Card
+class Family
 {
     /**
      * @ORM\Id()
@@ -24,12 +24,7 @@ class Card
     private $name;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $description;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\CardGroup", mappedBy="cards")
+     * @ORM\OneToMany(targetEntity="App\Entity\CardGroup", mappedBy="family")
      */
     private $groups;
 
@@ -55,18 +50,6 @@ class Card
         return $this;
     }
 
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
     /**
      * @return Collection|CardGroup[]
      */
@@ -79,7 +62,7 @@ class Card
     {
         if (!$this->groups->contains($group)) {
             $this->groups[] = $group;
-            $group->addCard($this);
+            $group->setFamily($this);
         }
 
         return $this;
@@ -89,7 +72,10 @@ class Card
     {
         if ($this->groups->contains($group)) {
             $this->groups->removeElement($group);
-            $group->removeCard($this);
+            // set the owning side to null (unless already changed)
+            if ($group->getFamily() === $this) {
+                $group->setFamily(null);
+            }
         }
 
         return $this;
