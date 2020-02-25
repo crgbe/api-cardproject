@@ -29,7 +29,7 @@ class Card
     private $description;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\CardGroup", mappedBy="cards")
+     * @ORM\ManyToMany(targetEntity="App\Entity\CardGroup", inversedBy="cards")
      */
     private $groups;
 
@@ -79,7 +79,6 @@ class Card
     {
         if (!$this->groups->contains($group)) {
             $this->groups[] = $group;
-            $group->addCard($this);
         }
 
         return $this;
@@ -89,7 +88,6 @@ class Card
     {
         if ($this->groups->contains($group)) {
             $this->groups->removeElement($group);
-            $group->removeCard($this);
         }
 
         return $this;

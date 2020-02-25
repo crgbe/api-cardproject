@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="CardGroupRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\CardGroupRepository")
  */
 class CardGroup
 {
@@ -24,14 +24,14 @@ class CardGroup
     private $name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Card", inversedBy="groups")
-     */
-    private $cards;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Family", inversedBy="groups")
      */
     private $family;
+
+//    /**
+//     * @ORM\ManyToMany(targetEntity="App\Entity\Card", mappedBy="groups")
+//     */
+//    private $cards;
 
     public function __construct()
     {
@@ -55,32 +55,6 @@ class CardGroup
         return $this;
     }
 
-    /**
-     * @return Collection|Card[]
-     */
-    public function getCards(): Collection
-    {
-        return $this->cards;
-    }
-
-    public function addCard(Card $card): self
-    {
-        if (!$this->cards->contains($card)) {
-            $this->cards[] = $card;
-        }
-
-        return $this;
-    }
-
-    public function removeCard(Card $card): self
-    {
-        if ($this->cards->contains($card)) {
-            $this->cards->removeElement($card);
-        }
-
-        return $this;
-    }
-
     public function getFamily(): ?Family
     {
         return $this->family;
@@ -92,4 +66,32 @@ class CardGroup
 
         return $this;
     }
+//
+//    /**
+//     * @return Collection|Card[]
+//     */
+//    public function getCards(): Collection
+//    {
+//        return $this->cards;
+//    }
+//
+//    public function addCard(Card $card): self
+//    {
+//        if (!$this->cards->contains($card)) {
+//            $this->cards[] = $card;
+//            $card->addGroup($this);
+//        }
+//
+//        return $this;
+//    }
+//
+//    public function removeCard(Card $card): self
+//    {
+//        if ($this->cards->contains($card)) {
+//            $this->cards->removeElement($card);
+//            $card->removeGroup($this);
+//        }
+//
+//        return $this;
+//    }
 }
