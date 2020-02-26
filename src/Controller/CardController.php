@@ -7,6 +7,7 @@ use App\Repository\CardRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,10 +20,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CardController extends AbstractFOSRestController
 {
     private $em;
+    private $serializer;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer)
     {
         $this->em = $em;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -34,7 +37,15 @@ class CardController extends AbstractFOSRestController
      */
     public function index(CardRepository $cardRepository)
     {
-        return $cardRepository->findAll();
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        $cards = $cardRepository->findAll();
+        $data = $this->serializer->serialize($cards, 'json', SerializationContext::create()->setGroups(['cards']));
+
+        $response->setContent($data);
+
+        return $response;
     }
 
     /**
@@ -46,7 +57,13 @@ class CardController extends AbstractFOSRestController
      * @Rest\View()
      */
     public function show(Card $card){
-        return $card;
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        $data = $this->serializer->serialize($card, 'json', SerializationContext::create()->setGroups(['card']));
+        $response->setContent($data);
+
+        return $response;
     }
 
     /**
