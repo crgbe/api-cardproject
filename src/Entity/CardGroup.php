@@ -17,14 +17,14 @@ class CardGroup
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      *
-     * @Serializer\Groups({"cards", "card"})
+     * @Serializer\Groups({"cards", "card", "card_groups"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
      *
-     * @Serializer\Groups({"cards", "card"})
+     * @Serializer\Groups({"cards", "card", "card_groups"})
      */
     private $name;
 
