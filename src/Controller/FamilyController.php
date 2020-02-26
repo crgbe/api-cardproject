@@ -7,6 +7,8 @@ use App\Repository\FamilyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +33,8 @@ class FamilyController extends AbstractFOSRestController
      *     path="/families",
      *     name="families_index"
      * )
+     * @param FamilyRepository $familyRepository
+     * @return Response
      */
     public function index(FamilyRepository $familyRepository)
     {
@@ -39,7 +43,7 @@ class FamilyController extends AbstractFOSRestController
 
         $families = $familyRepository->findAll();
 
-        $data = $this->serializer->serialize($families, 'json');
+        $data = $this->serializer->serialize($families, 'json', SerializationContext::create()->setGroups(['families']));
 
         $response->setContent($data);
 
@@ -52,13 +56,15 @@ class FamilyController extends AbstractFOSRestController
      *     name="families_show",
      *     requirements={"id"="\d+"}
      * )
+     * @param Family $family
+     * @return Response
      */
     public function show(Family $family)
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
-        $data = $this->serializer->serialize($family, 'json');
+        $data = $this->serializer->serialize($family, 'json', SerializationContext::create()->setGroups(['family']));
 
         $response->setContent($data);
 
@@ -70,6 +76,8 @@ class FamilyController extends AbstractFOSRestController
      *     path="/families",
      *     name="families_add"
      * )
+     * @param Request $request
+     * @return View
      */
     public function add(Request $request){
         $response = new Response();
@@ -93,6 +101,9 @@ class FamilyController extends AbstractFOSRestController
      *     name="families_edit",
      *     requirements={"id"="\d+"}
      * )
+     * @param Family $family
+     * @param Request $request
+     * @return View
      */
     public function edit(Family $family, Request $request){
         $response = new Response();
@@ -118,6 +129,8 @@ class FamilyController extends AbstractFOSRestController
      *     name="/families_delete",
      *     requirements={"id"="\d+"}
      * )
+     * @param Family $family
+     * @return View
      */
     public function delete(Family $family){
         $this->em->remove($family);

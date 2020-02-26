@@ -16,22 +16,49 @@ class CardGroup
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     *
-     * @Serializer\Groups({"cards", "card", "card_groups"})
+     * @Serializer\Groups({
+     *     "cards",
+     *     "card",
+     *     "card_groups",
+     *     "card_group",
+     *     "families",
+     *     "family"
+     * })
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
-     *
-     * @Serializer\Groups({"cards", "card", "card_groups"})
+     * @Serializer\Groups({
+     *     "cards",
+     *     "card",
+     *     "card_groups",
+     *     "card_group",
+     *     "families",
+     *     "family"
+     * })
      */
     private $name;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Card", mappedBy="groups")
+     * @Serializer\Groups({
+     *     "card_groups",
+     *     "card_group",
+     *     "families",
+     *     "family"
+     * })
      */
     private $cards;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Family", inversedBy="cardGroups")
+     * @Serializer\Groups({
+     *     "card_groups",
+     *     "card_group"
+     * })
+     */
+    private $family;
 
     public function __construct()
     {
@@ -79,6 +106,18 @@ class CardGroup
             $this->cards->removeElement($card);
             $card->removeGroup($this);
         }
+
+        return $this;
+    }
+
+    public function getFamily(): ?Family
+    {
+        return $this->family;
+    }
+
+    public function setFamily(?Family $family): self
+    {
+        $this->family = $family;
 
         return $this;
     }
