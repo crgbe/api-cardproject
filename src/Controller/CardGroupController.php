@@ -50,7 +50,6 @@ class CardGroupController extends AbstractFOSRestController
         return $response;
     }
 
-
     /**
      * @Rest\Get(
      *     path="/card-groups/{id}",
@@ -65,7 +64,7 @@ class CardGroupController extends AbstractFOSRestController
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
-        $data = $this->serializer->serialize($cardGroup, 'json', SerializationContext::create()->setGroups(['card']));
+        $data = $this->serializer->serialize($cardGroup, 'json', SerializationContext::create()->setGroups(['card_group']));
         $response->setContent($data);
 
         return $response;

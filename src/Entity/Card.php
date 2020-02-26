@@ -16,29 +16,49 @@ class Card
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     *
-     * @Serializer\Groups({"cards", "card"})
+     * @Serializer\Groups({
+     *     "cards",
+     *     "card",
+     *     "card_groups",
+     *     "card_group",
+     *     "families",
+     *     "family"
+     * })
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
-     *
-     * @Serializer\Groups({"cards", "card"})
+     * @Serializer\Groups({
+     *     "cards",
+     *     "card",
+     *     "card_groups",
+     *     "card_group",
+     *     "families",
+     *     "family"
+     * })
      */
     private $name;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     *
-     * @Serializer\Groups({"cards", "card"})
+     * @Serializer\Groups({
+     *     "cards",
+     *     "card",
+     *     "card_groups",
+     *     "card_group",
+     *     "families",
+     *     "family"
+     * })
      */
     private $description;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\CardGroup", inversedBy="cards")
-     *
-     * @Serializer\Groups({"cards", "card"})
+     * @Serializer\Groups({
+     *     "cards",
+     *     "card",
+     * })
      */
     private $groups;
 
