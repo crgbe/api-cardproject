@@ -120,6 +120,6 @@ class CardController extends AbstractFOSRestController
         $this->em->remove($card);
         $this->em->flush();
 
-        return new Response("The card is successfully deleted");
+        return new Response(['message' => 'The card is successfully deleted']);
     }
 }
